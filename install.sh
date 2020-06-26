@@ -44,14 +44,18 @@ echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Nn]$ ]]
 then
     echo "Restarting pulse audio"
-    # ignore errors if we restart too often / to fast .. we just ensure to nuke it
-    pulseaudio -k > /dev/null 2>&1 || true
-    pulseaudio -k > /dev/null 2>&1 || true
-    pulseaudio -k > /dev/null 2>&1 || true
+    if ! [ -x "$(command -v systemctl)" ]; then
+        systemctl --user restart pulseaudio.service
+    else
+        # ignore errors if we restart too often / to fast .. we just ensure to nuke it
+        pulseaudio -k > /dev/null 2>&1 || true
+        pulseaudio -k > /dev/null 2>&1 || true
+        pulseaudio -k > /dev/null 2>&1 || true
 
-    echo "Ensure pulseaudio is started"
-    sleep 2
-    pulseaudio -D    
+        echo "Ensure pulseaudio is started"
+        sleep 2
+        pulseaudio -D
+    fi
 else
     echo "Skipped pulseaudio restart"
 fi
